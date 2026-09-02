@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مینی کوییزلت من</title>
+    <title>اپلیکیشن فلش‌کارت من</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -14,160 +14,84 @@
             --danger: #ff725b;
             --text-main: #1a1d28;
             --text-light: #586380;
+            --border-color: #edeff4;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        /* هدر و نوار پیشرفت */
-        .header {
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-
-        .stats { display: flex; gap: 20px; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        .header { width: 100%; max-width: 600px; padding: 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; border-bottom: 2px solid var(--border-color); }
+        .header-title { font-size: 1.2rem; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .stats { display: flex; gap: 15px; font-size: 0.9rem; font-weight: bold; }
         .stat-item.learning { color: var(--danger); }
         .stat-item.mastered { color: var(--success); }
 
-        /* بخش کارت */
-        .card-container {
-            perspective: 1000px;
-            width: 90%;
-            max-width: 500px;
-            height: 350px;
-            margin-bottom: 30px;
-        }
+        /* لودینگ */
+        #loader { margin-top: 50px; font-size: 1.2rem; color: var(--primary); display: flex; flex-direction: column; align-items: center; gap: 15px; font-weight: bold; }
+        .spinner { border: 4px solid rgba(0,0,0,0.1); border-left-color: var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .card {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            cursor: pointer;
-            box-shadow: 0 0.25rem 1rem rgba(48,53,69,0.08);
-            border-radius: 1rem;
-        }
-
+        .card-container { display: none; perspective: 1000px; width: 90%; max-width: 500px; height: 450px; margin-bottom: 30px; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; box-shadow: 0 0.25rem 1rem rgba(48,53,69,0.08); border-radius: 1rem; }
         .card.flipped { transform: rotateY(-180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: var(--card-bg); border-radius: 1rem; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; border: 2px solid transparent; }
+        
+        .card-front { align-items: center; justify-content: center; }
+        .word-text-front { font-size: 3rem; color: var(--text-main); margin: 0; direction: ltr; }
+        .click-hint { color: var(--text-light); margin-top: 30px; font-size: 0.95rem; }
 
-        .card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            background: var(--card-bg);
-            border-radius: 1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-            border: 2px solid transparent;
-        }
+        .card-back { transform: rotateY(180deg); overflow-y: auto; text-align: right; }
+        .back-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        .word-text-back { font-size: 1.8rem; color: var(--text-main); margin: 0; direction: ltr; }
+        .translation-back { font-size: 1.5rem; color: var(--primary); font-weight: bold; }
+        .section-title { font-size: 0.85rem; color: var(--text-light); font-weight: bold; text-transform: uppercase; margin-top: 15px; margin-bottom: 5px; }
+        .vocab-info { color: var(--text-main); font-size: 1.1rem; direction: ltr; text-align: left; background: var(--bg-color); padding: 8px; border-radius: 8px; }
+        .sentences-list { margin: 0; padding-left: 20px; direction: ltr; text-align: left; }
+        .sentences-list li { margin-bottom: 8px; color: var(--text-main); font-size: 1.05rem; line-height: 1.4; }
 
-        .card-back {
-            transform: rotateY(180deg);
-        }
-
-        .word-text { font-size: 3rem; color: var(--text-main); margin: 0; direction: ltr; }
-        .translation { font-size: 2rem; color: var(--primary); margin-top: 15px; }
-        .example { font-size: 1.1rem; color: var(--text-light); margin-top: 20px; text-align: center; direction: ltr; }
-
-        /* دکمه پخش صدا */
-        .audio-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--primary);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .audio-btn:hover { transform: scale(1.1); }
-
-        /* دکمه‌های کنترل (بلد بودم / نبودم) */
-        .controls {
-            display: flex;
-            gap: 20px;
-            width: 90%;
-            max-width: 500px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .controls.visible {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .btn:active { transform: scale(0.95); }
+        .audio-btn { background: none; border: none; font-size: 1.4rem; color: var(--primary); cursor: pointer; transition: 0.2s; padding: 10px; }
+        
+        .controls { display: none; gap: 20px; width: 90%; max-width: 500px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .controls.visible { display: flex; opacity: 1; pointer-events: all; }
+        .btn { flex: 1; padding: 15px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: bold; color: white; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-know { background-color: var(--success); }
         .btn-dont-know { background-color: var(--danger); }
-
-        .finish-message {
-            display: none;
-            font-size: 2rem;
-            color: var(--success);
-            text-align: center;
-            margin-top: 50px;
-        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary);">Quizlet Clone</div>
+        <div class="header-title"><i class="fas fa-layer-group"></i> لغات من</div>
         <div class="stats">
             <div class="stat-item learning">در حال یادگیری: <span id="learning-count">0</span></div>
             <div class="stat-item mastered">یادگرفته‌ها: <span id="mastered-count">0</span></div>
         </div>
     </div>
 
+    <!-- بخش لودینگ -->
+    <div id="loader">
+        <div class="spinner"></div>
+        در حال دریافت کلمات از سرور...
+    </div>
+
     <div class="card-container" id="card-container" onclick="flipCard()">
         <div class="card" id="flashcard">
-            <!-- روی کارت -->
             <div class="card-face card-front">
-                <button class="audio-btn" onclick="playAudio(event)"><i class="fas fa-volume-up"></i></button>
-                <h1 class="word-text" id="front-word"></h1>
-                <div style="color: var(--text-light); margin-top: 30px; font-size: 0.9rem;">برای دیدن جواب کلیک کن</div>
+                <button class="audio-btn" style="position: absolute; top: 15px; right: 15px;" onclick="playAudio(event)"><i class="fas fa-volume-up"></i></button>
+                <h1 class="word-text-front" id="front-word"></h1>
+                <div class="click-hint">برای دیدن جواب روی کارت بزنید</div>
             </div>
-            <!-- پشت کارت -->
             <div class="card-face card-back">
-                <button class="audio-btn" onclick="playAudio(event)"><i class="fas fa-volume-up"></i></button>
-                <h1 class="word-text" id="back-word"></h1>
-                <div class="translation" id="translation"></div>
-                <div class="example" id="example"></div>
+                <div class="back-header">
+                    <div class="translation-back" id="back-translation"></div>
+                    <button class="audio-btn" onclick="playAudio(event)"><i class="fas fa-volume-up"></i></button>
+                </div>
+                <h2 class="word-text-back" id="back-word"></h2>
+                <div class="section-title">Synonyms</div>
+                <div class="vocab-info" id="back-synonyms"></div>
+                <div class="section-title">Antonyms</div>
+                <div class="vocab-info" id="back-antonyms"></div>
+                <div class="section-title">Sentences</div>
+                <ul class="sentences-list" id="back-sentences"></ul>
             </div>
         </div>
     </div>
@@ -177,55 +101,113 @@
         <button class="btn btn-know" onclick="answerCard(true)">بلد بودم ✔️</button>
     </div>
 
-    <div class="finish-message" id="finish-message">
-        🎉 آفرین! همه کلمات رو یاد گرفتی!
-    </div>
-
     <script>
-        // دیتابیس کلمات (وزن اولیه برای همه عدد 3 است. وزن 0 یعنی یادگرفته شده)
-        let vocabList = [
-            { word: "Resilient", translation: "انعطاف‌پذیر، مقاوم", example: "She is very resilient to stress.", weight: 3 },
-            { word: "Ubiquitous", translation: "حاضر در همه‌جا", example: "Smartphones have become ubiquitous.", weight: 3 },
-            { word: "Meticulous", translation: "دقیق و موشکافانه", example: "He is meticulous about his work.", weight: 3 },
-            { word: "Ephemeral", translation: "زودگذر، موقتی", example: "Fame can be ephemeral.", weight: 3 },
-            { word: "Eloquent", translation: "فصیح و شیوا", example: "She gave an eloquent speech.", weight: 3 }
-        ];
+        // لینک فایل TSV گوگل شیت خود را اینجا قرار دهید:
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1-3ZFyh5hOTdiyFlNZEjVq8Ki14meffTdM-AHIzsQwco/edit?usp=drivesdk'; 
 
+        let vocabList = [];
         let currentCard = null;
-        const cardElement = document.getElementById('flashcard');
-        const controls = document.getElementById('controls');
-
-        // موتور تولید صدای مرورگر
         const synth = window.speechSynthesis;
+
+        // تابع اصلی برای دریافت اطلاعات از گوگل شیت
+        async function fetchWords() {
+            try {
+                // اگر لینکی وارد نکرده باشید، از دیتای تستی استفاده می‌کند تا برنامه متوقف نشود
+                if(SHEET_URL === 'https://docs.google.com/spreadsheets/d/1-3ZFyh5hOTdiyFlNZEjVq8Ki14meffTdM-AHIzsQwco/edit?usp=drivesdk') {
+                    throw new Error("لینک گوگل شیت تنظیم نشده است");
+                }
+
+                const response = await fetch(SHEET_URL);
+                const data = await response.text();
+                parseTSV(data);
+            } catch (error) {
+                console.log("خطا در اتصال به اینترنت یا لینک اشتباه. بارگذاری دیتای آفلاین تستی...");
+                vocabList = [
+                    { word: "Resilient", translation: "انعطاف‌پذیر، مقاوم", synonyms: "Tough, Strong", antonyms: "Fragile", sentences: ["She is resilient.", "He showed resilient character."], weight: 3 }
+                ];
+                loadUserProgress(); // بررسی پیشرفت ذخیره شده
+                startApp();
+            }
+        }
+
+        // تبدیل متن خام گوگل شیت به آرایه کلمات
+        function parseTSV(tsvText) {
+            const rows = tsvText.split('\n');
+            vocabList = [];
+            
+            // از سطر دوم شروع می‌کنیم (سطر اول هدر است)
+            for (let i = 1; i < rows.length; i++) {
+                if (rows[i].trim() === '') continue;
+                
+                const columns = rows[i].split('\t'); // جدا کردن ستون‌ها با کلید Tab
+                if (columns.length >= 2) {
+                    vocabList.push({
+                        word: columns[0] ? columns[0].trim() : "",
+                        translation: columns[1] ? columns[1].trim() : "",
+                        synonyms: columns[2] ? columns[2].trim() : "ندارد",
+                        antonyms: columns[3] ? columns[3].trim() : "ندارد",
+                        // جدا کردن جملات با علامت |
+                        sentences: columns[4] ? columns[4].split('|').map(s => s.trim()) : [],
+                        weight: 3 // وزن اولیه
+                    });
+                }
+            }
+            loadUserProgress();
+            startApp();
+        }
+
+        // ترکیب دیتای سرور با پیشرفت ذخیره شده در گوشی کاربر
+        function loadUserProgress() {
+            const savedData = localStorage.getItem('myQuizletProgress');
+            if (savedData) {
+                const userWeights = JSON.parse(savedData);
+                // وزن هر کلمه را از گوشی کاربر می‌خوانیم
+                vocabList.forEach(item => {
+                    if (userWeights[item.word] !== undefined) {
+                        item.weight = userWeights[item.word];
+                    }
+                });
+            }
+        }
+
+        // ذخیره پیشرفت در گوشی کاربر
+        function saveUserProgress() {
+            const userWeights = {};
+            vocabList.forEach(item => {
+                userWeights[item.word] = item.weight;
+            });
+            localStorage.setItem('myQuizletProgress', JSON.stringify(userWeights));
+        }
+
+        function startApp() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('card-container').style.display = 'block';
+            pickNextCard();
+        }
 
         function updateStats() {
             let learning = vocabList.filter(w => w.weight > 0).length;
             let mastered = vocabList.filter(w => w.weight === 0).length;
-            
             document.getElementById('learning-count').textContent = learning;
             document.getElementById('mastered-count').textContent = mastered;
 
-            if (learning === 0) {
+            if (learning === 0 && vocabList.length > 0) {
+                alert("🎉 آفرین! تمام کلمات لیست فعلی را یاد گرفتی.");
                 document.getElementById('card-container').style.display = 'none';
-                controls.style.display = 'none';
-                document.getElementById('finish-message').style.display = 'block';
-                return true; // پایان بازی
+                document.getElementById('controls').style.display = 'none';
+                return true;
             }
             return false;
         }
 
-        // الگوریتم انتخاب کلمه (کلماتی که وزن بیشتری دارند، شانس بیشتری برای نمایش دارند)
         function pickNextCard() {
             if (updateStats()) return;
 
             let learningWords = vocabList.filter(w => w.weight > 0);
-            
-            // جلوگیری از تکرار پشت سر هم یک کلمه (مگر اینکه فقط یک کلمه مانده باشد)
             if (learningWords.length > 1 && currentCard) {
                 learningWords = learningWords.filter(w => w.word !== currentCard.word);
             }
 
-            // انتخاب بر اساس وزن (Spaced Repetition ساده)
             let totalWeight = learningWords.reduce((sum, w) => sum + w.weight, 0);
             let random = Math.random() * totalWeight;
             
@@ -237,61 +219,68 @@
                     break;
                 }
             }
-
             loadCardToDOM();
         }
 
         function loadCardToDOM() {
             document.getElementById('front-word').textContent = currentCard.word;
             document.getElementById('back-word').textContent = currentCard.word;
-            document.getElementById('translation').textContent = currentCard.translation;
-            document.getElementById('example').textContent = currentCard.example;
+            document.getElementById('back-translation').textContent = currentCard.translation;
+            document.getElementById('back-synonyms').textContent = currentCard.synonyms;
+            document.getElementById('back-antonyms').textContent = currentCard.antonyms;
             
-            cardElement.classList.remove('flipped');
-            controls.classList.remove('visible'); // دکمه‌ها مخفی تا وقتی کاربر کارت را برگرداند
+            const sentencesUl = document.getElementById('back-sentences');
+            sentencesUl.innerHTML = '';
+            if (currentCard.sentences && currentCard.sentences.length > 0) {
+                currentCard.sentences.forEach(sentence => {
+                    if(sentence) {
+                        let li = document.createElement('li');
+                        li.textContent = sentence;
+                        sentencesUl.appendChild(li);
+                    }
+                });
+            } else {
+                sentencesUl.innerHTML = '<li>جمله‌ای ثبت نشده است.</li>';
+            }
+            
+            document.getElementById('flashcard').classList.remove('flipped');
+            document.getElementById('controls').classList.remove('visible');
         }
 
         function flipCard() {
-            cardElement.classList.toggle('flipped');
-            // وقتی کارت برمی‌گردد، دکمه‌های "بلدم/نیستم" ظاهر می‌شوند
-            if (cardElement.classList.contains('flipped')) {
-                controls.classList.add('visible');
+            document.getElementById('flashcard').classList.toggle('flipped');
+            if (document.getElementById('flashcard').classList.contains('flipped')) {
+                document.getElementById('controls').classList.add('visible');
             } else {
-                controls.classList.remove('visible');
+                document.getElementById('controls').classList.remove('visible');
             }
         }
 
         function playAudio(event) {
-            event.stopPropagation(); // جلوگیری از چرخیدن کارت وقتی روی بلندگو کلیک می‌شود
-            if (synth.speaking) {
-                console.error('speechSynthesis.speaking');
-                return;
-            }
-            if (currentCard.word !== '') {
+            event.stopPropagation();
+            if (synth.speaking) return;
+            if (currentCard && currentCard.word) {
                 const utterThis = new SpeechSynthesisUtterance(currentCard.word);
-                utterThis.lang = 'en-US'; // لهجه آمریکایی
-                // utterThis.lang = 'en-GB'; // برای لهجه بریتیش این را فعال کن
-                utterThis.rate = 0.9; // سرعت خواندن
+                utterThis.lang = 'en-US';
+                utterThis.rate = 0.9;
                 synth.speak(utterThis);
             }
         }
 
         function answerCard(knewIt) {
             if (knewIt) {
-                currentCard.weight -= 1; // اگر بلد بود، وزنش کم می‌شود
+                currentCard.weight -= 1;
             } else {
-                currentCard.weight += 2; // اگر بلد نبود، وزنش زیاد می‌شود تا زودتر دوباره نشان داده شود
+                currentCard.weight += 2;
             }
-
-            // محدود کردن سقف وزن که خیلی زیاد نشود
             if(currentCard.weight > 5) currentCard.weight = 5;
-
-            // رفتن به کلمه بعدی با کمی مکث
+            
+            saveUserProgress(); // ذخیره خودکار بعد از هر پاسخ
             setTimeout(pickNextCard, 200);
         }
 
-        // شروع برنامه
-        pickNextCard();
+        // شروع اتصال به سرور هنگام باز شدن صفحه
+        fetchWords();
     </script>
 </body>
 </html>
