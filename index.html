@@ -5,33 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>فلش‌کارت‌های زبان من</title>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background: #f0f4f8; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
         .card-container { perspective: 1000px; width: 100%; max-width: 350px; height: 420px; }
-        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
         .card.flipped { transform: rotateY(-180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: white; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; }
-        .card-front { align-items: center; justify-content: center; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5); padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; }
+        .card-front { align-items: center; justify-content: center; }
         .card-back { transform: rotateY(180deg); overflow-y: auto; text-align: left; direction: ltr; }
-        .word-title { font-size: 2.5rem; color: #2563eb; font-weight: bold; text-align: center; margin: 0; }
-        .hint { color: #64748b; margin-top: 20px; font-size: 1rem; text-align: center; }
-        .section-title { font-size: 0.9rem; color: #64748b; margin-top: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; font-weight: bold; text-transform: uppercase; }
-        .items { color: #0f172a; margin-top: 5px; font-size: 1.1rem; font-weight: 500; }
-        .sentence { margin-top: 12px; font-size: 1rem; line-height: 1.5; color: #1e293b; display: flex; gap: 10px; align-items: flex-start; }
-        .level { font-size: 0.75rem; background: #e2e8f0; padding: 3px 8px; border-radius: 6px; font-weight: bold; color: #475569; white-space: nowrap; }
-        .next-btn { margin-top: 25px; padding: 15px 20px; background: #2563eb; color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer; width: 100%; max-width: 350px; box-shadow: 0 4px 10px rgba(37,99,235,0.3); transition: 0.2s; }
-        .next-btn:active { background: #1d4ed8; transform: scale(0.98); }
+        .word-title { font-size: 2.8rem; color: #4a4e69; font-weight: 800; text-align: center; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        .hint { color: #9a8c98; margin-top: 20px; font-size: 1.1rem; text-align: center; }
+        .section-title { font-size: 0.95rem; color: #c9ada7; margin-top: 15px; border-bottom: 2px solid #f2e9e4; padding-bottom: 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .items { color: #22223b; margin-top: 8px; font-size: 1.2rem; font-weight: 600; }
+        .sentence { margin-top: 15px; font-size: 1.05rem; line-height: 1.6; color: #4a4e69; display: flex; gap: 12px; align-items: flex-start; }
+        .level { font-size: 0.8rem; background: #9a8c98; padding: 4px 10px; border-radius: 8px; font-weight: bold; color: white; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .next-btn { margin-top: 30px; padding: 16px 24px; background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: white; border: none; border-radius: 15px; font-size: 1.3rem; font-weight: bold; cursor: pointer; width: 100%; max-width: 350px; box-shadow: 0 8px 20px rgba(37,99,235,0.4); transition: all 0.3s ease; }
+        .next-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(37,99,235,0.5); }
+        .next-btn:active { transform: translateY(1px); box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
     </style>
 </head>
 <body>
 
     <div class="card-container" onclick="flipCard()">
         <div class="card" id="flashcard">
+            <!-- روی کارت -->
             <div class="card-face card-front">
                 <h1 class="word-title" id="front-word">Word</h1>
                 <div class="hint">برای دیدن معنی و جملات، روی کارت بزن 👆</div>
             </div>
+            <!-- پشت کارت -->
             <div class="card-face card-back">
-                <h2 class="word-title" id="back-word" style="font-size: 2rem; margin-bottom: 10px;">Word</h2>
+                <h2 class="word-title" id="back-word" style="font-size: 2.2rem; margin-bottom: 15px; color: #22223b;">Word</h2>
                 
                 <div class="section-title">Synonyms (مترادف‌ها)</div>
                 <div class="items" id="synonyms"></div>
@@ -48,6 +51,7 @@
     <button class="next-btn" onclick="nextWord()">کلمه بعدی ➡️</button>
 
     <script>
+        // بانک کلمات شما
         const vocabList = [
             {
                 word: "Important",
@@ -86,7 +90,11 @@
 
         function loadWord() {
             const current = vocabList[currentIndex];
+            
+            // پر کردن روی کارت
             document.getElementById('front-word').textContent = current.word;
+            
+            // پر کردن پشت کارت
             document.getElementById('back-word').textContent = current.word;
             document.getElementById('synonyms').textContent = current.synonyms;
             document.getElementById('antonyms').textContent = current.antonyms;
@@ -101,13 +109,18 @@
             });
         }
 
-        function flipCard() { card.classList.toggle('flipped'); }
+        function flipCard() {
+            card.classList.toggle('flipped');
+        }
+
         function nextWord() {
             currentIndex = (currentIndex + 1) % vocabList.length;
             card.classList.remove('flipped');
-            setTimeout(loadWord, 200); 
+            // یه مکث کوتاه تا کارت برگرده بعد کلمه عوض بشه
+            setTimeout(loadWord, 300); 
         }
 
+        // اجرای اولیه
         loadWord();
     </script>
 </body>
